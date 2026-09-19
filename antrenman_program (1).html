@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="tr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gelişmiş Antrenman Programı - Videolu Rehber</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        day1: '#ff6b35',
+                        day2: '#00d4ff',
+                        day3: '#00ff88',
+                        darkbg: '#0a0a0c',
+                        cardbg: '#141418',
+                        bordercolor: '#22222a'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons & Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0c;
+            color: #f3f4f6;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: #000;
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .video-wrapper video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a2a35;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a3a48;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .exercise-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        @media (hover: hover) {
+            .exercise-card:hover {
+                transform: translateY(-3px);
+            }
+        }
+
+        .completed-card {
+            opacity: 0.65;
+            filter: grayscale(0.2);
+            border-color: #00ff88 !important;
+        }
+
+        .note-badge {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16 antialiased selection:bg-orange-500 selection:text-white">
+
+    <header class="bg-gradient-to-r from-gray-900 via-black to-gray-900 border-b border-gray-800/80 sticky top-0 z-50 backdrop-blur-xl bg-opacity-90">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-3 md:gap-4">
+                <div class="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-orange-500 via-cyan-400 to-emerald-400 flex items-center justify-center text-black font-extrabold text-xl shadow-lg shadow-orange-500/10">
+                            💪
+                        </div>
+                        <div>
+                            <h1 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+                                ANTRENMAN PROGRAMI
+                                <span class="text-[10px] px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30 font-bold uppercase tracking-wider">PRO</span>
+                            </h1>
+                            <p class="text-[11px] text-gray-400">2 Gün Antrenman • 1 Gün Dinlenme • HD Videolu</p>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Rest Timer Quick Toggle Button -->
+                    <button onclick="toggleRestTimerWidget()" class="md:hidden bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs font-semibold px-3 py-2 rounded-lg flex items-center gap-1.5 text-gray-200 transition active:scale-95">
+                        <i class="fa-solid fa-stopwatch text-orange-400"></i>
+                        <span id="mobileTimerText">Sayaç</span>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2.5 w-full md:w-auto">
+                    <div class="relative flex-1 md:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                        <input type="text" id="searchInput" oninput="searchExercises()" placeholder="Hareket veya bölge ara..." class="w-full bg-gray-800/80 border border-gray-700/80 text-xs sm:text-sm text-gray-200 pl-9 pr-3 py-2 rounded-xl focus:outline-none focus:border-orange-500 transition placeholder:text-gray-500">
+                    </div>
+
+                    <button onclick="toggleRestTimerWidget()" class="hidden md:flex bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs font-semibold px-3.5 py-2 rounded-xl items-center gap-2 text-gray-200 transition active:scale-95">
+                        <i class="fa-solid fa-stopwatch text-orange-400"></i>
+                        <span id="headerTimerText">Dinlenme Sayacı</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-start md:justify-center gap-2 mt-3.5 overflow-x-auto pb-1 no-scrollbar">
+                <button id="btn-filter-all" onclick="filterDay('all')" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-gray-800 text-white border border-gray-700 shadow-sm whitespace-nowrap active-filter">
+                    <i class="fa-solid fa-border-all"></i> Tüm Günler
+                </button>
+                <button id="btn-filter-day1" onclick="filterDay('day1')" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-gray-900/80 text-gray-400 border border-gray-800 hover:border-orange-500/50 hover:text-orange-400 whitespace-nowrap">
+                    <span class="w-2 h-2 rounded-full bg-orange-500"></span> Gün 1: Göğüs + Arka Kol
+                </button>
+                <button id="btn-filter-day2" onclick="filterDay('day2')" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-gray-900/80 text-gray-400 border border-gray-800 hover:border-cyan-500/50 hover:text-cyan-400 whitespace-nowrap">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Gün 2: Sırt + Ön Kol
+                </button>
+                <button id="btn-filter-day3" onclick="filterDay('day3')" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-gray-900/80 text-gray-400 border border-gray-800 hover:border-emerald-500/50 hover:text-emerald-400 whitespace-nowrap">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Gün 3: Omuz + Bacak
+                </button>
+                <button id="btn-filter-cardio" onclick="filterDay('cardio')" class="px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-gray-900/80 text-gray-400 border border-gray-800 hover:border-purple-500/50 hover:text-purple-400 whitespace-nowrap">
+                    <i class="fa-solid fa-heart-pulse text-purple-400"></i> Kardiyo
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div id="restTimerWidget" class="hidden fixed bottom-5 right-5 sm:bottom-6 sm:right-6 bg-gray-900/95 border border-gray-700/80 shadow-2xl rounded-2xl p-4 z-50 w-[calc(100vw-2.5rem)] sm:w-72 backdrop-blur-xl">
+        <div class="flex justify-between items-center mb-3">
+            <span class="text-xs font-bold uppercase tracking-wider text-gray-300 flex items-center gap-2">
+                <i class="fa-solid fa-stopwatch text-orange-400"></i> Dinlenme Zamanlayıcısı
+            </span>
+            <button onclick="toggleRestTimerWidget()" class="text-gray-400 hover:text-white text-xs p-1">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="text-center py-1">
+            <div id="timerDisplay" class="text-4xl font-black text-white tracking-widest font-mono mb-3">01:00</div>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="startTimer(30)" class="bg-gray-800 hover:bg-orange-600 hover:text-white active:scale-95 text-gray-300 font-bold py-2 rounded-xl text-xs border border-gray-700 transition">30 sn</button>
+                <button onclick="startTimer(60)" class="bg-gray-800 hover:bg-orange-600 hover:text-white active:scale-95 text-gray-300 font-bold py-2 rounded-xl text-xs border border-gray-700 transition">60 sn</button>
+                <button onclick="startTimer(90)" class="bg-gray-800 hover:bg-orange-600 hover:text-white active:scale-95 text-gray-300 font-bold py-2 rounded-xl text-xs border border-gray-700 transition">90 sn</button>
+            </div>
+            <button onclick="resetTimer()" class="w-full mt-2 bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-white font-semibold py-1.5 rounded-xl text-xs transition active:scale-95">Sıfırla</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10 space-y-10 sm:space-y-12">
+
+        <section id="day1" class="day-section">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center text-orange-500 font-black text-xl">
+                        1
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
+                            GÖĞÜS + ARKA KOL
+                            <span class="text-[10px] bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-md border border-orange-500/30 font-semibold">18 Set</span>
+                        </h2>
+                        <p class="text-xs text-gray-400">Göğüs Hacmi & Triceps Gücü</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                <!-- Bench Press -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-orange-500/40" id="card-bench-press">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-barbell-bench-press-side_KciuhbB.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 1</span>
+                            <button onclick="toggleComplete('card-bench-press')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1" title="Tamamlandı olarak işaretle">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Bench Press</h3>
+                        <p class="text-xs text-gray-400 mb-3">Düz Barbell Bench Press</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-orange-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Incline Dumbbell Press -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-orange-500/40" id="card-incline-db-press">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Dumbbells-dumbbell-incline-bench-press-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 2</span>
+                            <button onclick="toggleComplete('card-incline-db-press')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Incline Dumbbell Press</h3>
+                        <p class="text-xs text-gray-400 mb-3">Eğimli Sehpada Dumbbell Pres</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-lg text-center font-bold text-xs text-orange-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pec Deck Machine Fly -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-orange-500/40" id="card-pec-deck">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Machine-machine-pec-fly-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 3</span>
+                            <button onclick="toggleComplete('card-pec-deck')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Pec Deck Machine Fly</h3>
+                        <p class="text-xs text-gray-400 mb-3">Göğüs Sıkıştırma Makinesi</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-orange-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-orange-500/40" id="card-cable-fly">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Cables-cable-standing-decline-chest-press-front.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 4</span>
+                            <button onclick="toggleComplete('card-cable-fly')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Cable Fly</h3>
+                        <p class="text-xs text-gray-400 mb-2">Ayakta Kablo Çekişi</p>
+                        
+                        <!-- Note Added -->
+                        <div class="note-badge px-2.5 py-1 rounded-lg text-xs font-semibold text-orange-300 mb-3 flex items-center gap-1.5">
+                            <span>💡 Not:</span> Alt göğüs için
+                        </div>
+
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-orange-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-orange-500/40" id="card-skull-crushers">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Dumbbells-dumbbell-skullcrusher-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 5</span>
+                            <button onclick="toggleComplete('card-skull-crushers')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Skull Crushers</h3>
+                        <p class="text-xs text-gray-400 mb-2">Alna Triceps Açış</p>
+                        
+                        <!-- Note Added -->
+                        <div class="note-badge px-2.5 py-1 rounded-lg text-xs font-semibold text-orange-300 mb-3 flex items-center gap-1.5">
+                            <span>💡 Not:</span> Z bar ile yap
+                        </div>
+
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-orange-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-orange-500/40" id="card-tricep-pushdown">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-cable-push-downs-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 6</span>
+                            <button onclick="toggleComplete('card-tricep-pushdown')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Triceps Pushdown</h3>
+                        <p class="text-xs text-gray-400 mb-2">Kablolu Arka Kol İtiş</p>
+                        
+                        <!-- Note Added -->
+                        <div class="note-badge px-2.5 py-1.5 rounded-lg text-xs font-semibold text-orange-300 mb-3 leading-snug flex items-start gap-1.5">
+                            <span class="shrink-0">💡 Not:</span>
+                            <span>V bar, düz bar ya da halat ile yapabilirsin</span>
+                        </div>
+
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-orange-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="day2" class="day-section">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 font-black text-xl">
+                        2
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
+                            SIRT + ÖN KOL
+                            <span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-2 py-0.5 rounded-md border border-cyan-500/30 font-semibold">24 Set</span>
+                        </h2>
+                        <p class="text-xs text-gray-400">Kanat Genişliği & Biceps Hacmi</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                <!-- Lat Pulldown -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-cyan-500/40" id="card-lat-pulldown">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-machine-pulldown-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 1</span>
+                            <button onclick="toggleComplete('card-lat-pulldown')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Lat Pulldown</h3>
+                        <p class="text-xs text-gray-400 mb-3">Geniş Tutuş Lat Çekişi</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-cyan-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Close Grip Lat Pulldown -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-cyan-500/40" id="card-close-grip-lat">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Machine-neutral-pulldown-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 2</span>
+                            <button onclick="toggleComplete('card-close-grip-lat')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Close Grip Lat Pulldown</h3>
+                        <p class="text-xs text-gray-400 mb-3">Dar Grip / Nötr Tutuş Çekiş</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-cyan-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cable Row -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-cyan-500/40" id="card-cable-row">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-machine-seated-cable-row-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 3</span>
+                            <button onclick="toggleComplete('card-cable-row')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Cable Row</h3>
+                        <p class="text-xs text-gray-400 mb-3">Oturarak Kablo Çekişi</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-cyan-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Machine Row -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-cyan-500/40" id="card-machine-row">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Machine-machine-plate-loaded-row-front.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 4</span>
+                            <button onclick="toggleComplete('card-machine-row')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Machine Row</h3>
+                        <p class="text-xs text-gray-400 mb-3">Göğüs Destekli Sırt Makinesi</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-cyan-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-cyan-500/40" id="card-incline-db-curl">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Dumbbells-dumbbell-incline-curl-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 5</span>
+                            <button onclick="toggleComplete('card-incline-db-curl')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Incline Dumbbell Curl</h3>
+                        <p class="text-xs text-gray-400 mb-3">Eğimli Sehpada Biceps Curl</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-cyan-400">
+                            3 SET × 15 + 2-3 REP
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card bg-cardbg border border-cyan-500/30 rounded-2xl overflow-hidden hover:border-cyan-500/60 shadow-lg shadow-cyan-950/20" id="card-biceps-curl-multi">
+                    <div class="video-wrapper">
+                        <video id="video-biceps-curl" src="https://musclewiki.com/api-next/videos/male-Barbell-barbell-curl-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-[10px] font-bold text-cyan-400 tracking-wider uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-layer-group"></i> Egzersiz 6 (İki Seçenekli)
+                            </span>
+                            <button onclick="toggleComplete('card-biceps-curl-multi')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+
+                        <!-- Instructions Badge for Multi-Option Exercise -->
+                        <div class="bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-[11px] font-bold py-1 px-2.5 rounded-lg mb-2.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-info text-cyan-400"></i>
+                            <span>Sadece birini seçip yapmanız yeterlidir.</span>
+                        </div>
+
+                        <!-- Switcher Tabs -->
+                        <div class="grid grid-cols-2 gap-1 p-1 bg-gray-900 rounded-xl mb-3 border border-gray-800">
+                            <button onclick="switchVideo('video-biceps-curl', 'https://musclewiki.com/api-next/videos/male-Barbell-barbell-curl-side.mp4', this, 'title-biceps-curl', 'Barbell Curl')" class="text-xs font-bold py-1.5 rounded-lg text-cyan-300 bg-gray-800 border border-cyan-500/40 shadow-sm transition">
+                                Barbell
+                            </button>
+                            <button onclick="switchVideo('video-biceps-curl', 'https://musclewiki.com/api-next/videos/male-Cables-cable-bar-curl-front.mp4', this, 'title-biceps-curl', 'Cable Curl')" class="text-xs font-semibold py-1.5 rounded-lg text-gray-400 hover:text-white transition">
+                                Cable
+                            </button>
+                        </div>
+
+                        <h3 id="title-biceps-curl" class="font-bold text-gray-100 text-base">Barbell Curl</h3>
+                        <p class="text-xs text-gray-400 mb-2">Barbell veya Kablo Biceps Curl</p>
+                        
+                        <!-- Note Added -->
+                        <div class="note-badge px-2.5 py-1 rounded-lg text-xs font-semibold text-cyan-300 mb-3 flex items-center gap-1.5">
+                            <span>💡 Not:</span> Düz bar ile yap
+                        </div>
+
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-cyan-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-cyan-500/40" id="card-zbar-reverse-curl">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Barbell-barbell-reverse-curl-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 7</span>
+                            <button onclick="toggleComplete('card-zbar-reverse-curl')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Z Bar Reverse Curl</h3>
+                        <p class="text-xs text-gray-400 mb-2">Ters Tutuş Biceps / Ön Kol</p>
+                        
+                        <!-- Note Added -->
+                        <div class="note-badge px-2.5 py-1 rounded-lg text-xs font-semibold text-cyan-300 mb-3 flex items-center gap-1.5">
+                            <span>💡 Not:</span> Z bar ile yap
+                        </div>
+
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-cyan-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-cyan-500/40" id="card-hammer-curl">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Dumbbells-dumbbell-hammer-curl-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-cyan-400 tracking-wider uppercase">Egzersiz 8 (Yeni)</span>
+                            <button onclick="toggleComplete('card-hammer-curl')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Hammer Curl</h3>
+                        <p class="text-xs text-gray-400 mb-3">Çekiç Tutuş Dumbbell Biceps</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-cyan-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="day3" class="day-section">
+            <div class="flex items-center justify-between border-b border-gray-800 pb-4 mb-6">
+                <div class="flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 font-black text-xl">
+                        3
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2.5">
+                            OMUZ + BACAK
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-500/30 font-semibold">18 Set</span>
+                        </h2>
+                        <p class="text-xs text-gray-400">Omuz Genişliği & Alt Vücut Gücü</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+                <!-- Machine Shoulder Press -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-emerald-500/40" id="card-shoulder-press">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Machine-machine-neutral-overhead-press-front.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 1</span>
+                            <button onclick="toggleComplete('card-shoulder-press')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Machine Shoulder Press</h3>
+                        <p class="text-xs text-gray-400 mb-3">Omuz Pres Makinesi</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-emerald-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card bg-cardbg border border-emerald-500/30 rounded-2xl overflow-hidden hover:border-emerald-500/60 shadow-lg shadow-emerald-950/20" id="card-lateral-raise-multi">
+                    <div class="video-wrapper">
+                        <video id="video-lateral-raise" src="https://musclewiki.com/api-next/videos/male-Cables-cable-lateral-raise-front.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-[10px] font-bold text-emerald-400 tracking-wider uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-layer-group"></i> Egzersiz 2 (İki Seçenekli)
+                            </span>
+                            <button onclick="toggleComplete('card-lateral-raise-multi')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+
+                        <!-- Instructions Badge -->
+                        <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold py-1 px-2.5 rounded-lg mb-2.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-info text-emerald-400"></i>
+                            <span>Sadece birini seçip yapmanız yeterlidir.</span>
+                        </div>
+
+                        <!-- Switcher Tabs -->
+                        <div class="grid grid-cols-2 gap-1 p-1 bg-gray-900 rounded-xl mb-3 border border-gray-800">
+                            <button onclick="switchVideo('video-lateral-raise', 'https://musclewiki.com/api-next/videos/male-Cables-cable-lateral-raise-front.mp4', this, 'title-lateral-raise', 'Cable Lateral Raise')" class="text-xs font-bold py-1.5 rounded-lg text-emerald-300 bg-gray-800 border border-emerald-500/40 shadow-sm transition">
+                                Cable
+                            </button>
+                            <button onclick="switchVideo('video-lateral-raise', 'https://musclewiki.com/api-next/videos/male-Dumbbells-dumbbell-lateral-raise-side.mp4', this, 'title-lateral-raise', 'Dumbbell Lateral Raise')" class="text-xs font-semibold py-1.5 rounded-lg text-gray-400 hover:text-white transition">
+                                Dumbbell
+                            </button>
+                        </div>
+
+                        <h3 id="title-lateral-raise" class="font-bold text-gray-100 text-base">Cable Lateral Raise</h3>
+                        <p class="text-xs text-gray-400 mb-3">Yan Omuz Açış</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-emerald-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rear Delt Fly Machine -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-emerald-500/40" id="card-rear-delt">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Machine-machine-reverse-fly-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 3</span>
+                            <button onclick="toggleComplete('card-rear-delt')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Rear Delt Fly Machine</h3>
+                        <p class="text-xs text-gray-400 mb-3">Arka Omuz Açış Makinesi</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-emerald-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <div class="exercise-card bg-cardbg border border-emerald-500/30 rounded-2xl overflow-hidden hover:border-emerald-500/60 shadow-lg shadow-emerald-950/20" id="card-leg-press-multi">
+                    <div class="video-wrapper">
+                        <video id="video-leg-main" src="https://musclewiki.com/api-next/videos/male-Smithmachine-squat-front.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="text-[10px] font-bold text-emerald-400 tracking-wider uppercase flex items-center gap-1">
+                                <i class="fa-solid fa-layer-group"></i> Egzersiz 4 (İki Seçenekli)
+                            </span>
+                            <button onclick="toggleComplete('card-leg-press-multi')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+
+                        <!-- Instructions Badge -->
+                        <div class="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold py-1 px-2.5 rounded-lg mb-2.5 flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-info text-emerald-400"></i>
+                            <span>Sadece birini seçip yapmanız yeterlidir.</span>
+                        </div>
+
+                        <!-- Switcher Tabs -->
+                        <div class="grid grid-cols-2 gap-1 p-1 bg-gray-900 rounded-xl mb-3 border border-gray-800">
+                            <button onclick="switchVideo('video-leg-main', 'https://musclewiki.com/api-next/videos/male-Smithmachine-squat-front.mp4', this, 'title-leg-main', 'Smith Machine Squat')" class="text-xs font-bold py-1.5 rounded-lg text-emerald-300 bg-gray-800 border border-emerald-500/40 shadow-sm transition">
+                                Squat
+                            </button>
+                            <button onclick="switchVideo('video-leg-main', 'https://musclewiki.com/api-next/videos/male-Machine-machine-leg-press-front.mp4', this, 'title-leg-main', 'Leg Press Machine')" class="text-xs font-semibold py-1.5 rounded-lg text-gray-400 hover:text-white transition">
+                                Leg Press
+                            </button>
+                        </div>
+
+                        <h3 id="title-leg-main" class="font-bold text-gray-100 text-base">Smith Machine Squat</h3>
+                        <p class="text-xs text-gray-400 mb-3">Squat veya Bacak İtiş Makinesi</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-emerald-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leg Extension -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-emerald-500/40" id="card-leg-extension">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-machine-leg-extension-front.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 5</span>
+                            <button onclick="toggleComplete('card-leg-extension')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Leg Extension</h3>
+                        <p class="text-xs text-gray-400 mb-3">Ön Bacak Uzatma Makinesi</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-emerald-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leg Curl -->
+                <div class="exercise-card bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-emerald-500/40" id="card-leg-curl">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Machine-seated-leg-curl-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 sm:p-5">
+                        <div class="flex justify-between items-start mb-1.5">
+                            <span class="text-[10px] font-bold text-gray-400 tracking-wider uppercase">Egzersiz 6</span>
+                            <button onclick="toggleComplete('card-leg-curl')" class="complete-btn text-gray-500 hover:text-emerald-400 text-base transition p-1">
+                                <i class="fa-regular fa-circle-check"></i>
+                            </button>
+                        </div>
+                        <h3 class="font-bold text-gray-100 text-base">Leg Curl</h3>
+                        <p class="text-xs text-gray-400 mb-3">Arka Bacak Kıvırma Makinesi</p>
+                        <div class="bg-gray-900/90 border border-gray-800 py-2 px-3 rounded-xl text-center font-bold text-xs text-emerald-400">
+                            3 SET × 15 REP
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="cardio" class="day-section bg-gradient-to-br from-gray-900 via-emerald-950/20 to-gray-900 border border-emerald-500/30 rounded-3xl p-5 sm:p-8">
+            <div class="text-center max-w-xl mx-auto mb-6 sm:mb-8">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 mb-3 text-2xl font-bold shadow-inner">
+                    🏃
+                </div>
+                <h2 class="text-xl sm:text-2xl font-black text-white">KARDİYOVASKÜLER ANTRENMAN</h2>
+                <p class="text-xs text-gray-400 mt-1">Antrenman sonu yağ yakımı ve kondisyon için</p>
+                <div class="inline-block mt-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-extrabold text-xs sm:text-sm px-4 py-1.5 rounded-full">
+                    SÜRE: 15 - 20 DAKİKA
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 max-w-4xl mx-auto">
+                <!-- Cardio Option 1: Treadmill -->
+                <div class="bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-emerald-500/40 transition">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Cardio-curve-treadmill-front.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 text-center">
+                        <h3 class="font-bold text-gray-100 text-base">Seçenek A: Koşu Bandı</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Eğimli Yürüyüş veya Tempolu Koşu</p>
+                    </div>
+                </div>
+
+                <!-- Cardio Option 2: Bike -->
+                <div class="bg-cardbg border border-gray-800/90 rounded-2xl overflow-hidden hover:border-emerald-500/40 transition">
+                    <div class="video-wrapper">
+                        <video src="https://musclewiki.com/api-next/videos/male-Cardio-stationary-bike-side.mp4" autoplay loop muted playsinline controls preload="metadata"></video>
+                    </div>
+                    <div class="p-4 text-center">
+                        <h3 class="font-bold text-gray-100 text-base">Seçenek B: Kondisyon Bisikleti</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Orta Dirençli Sabit Tempo Bisiklet</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-12 sm:mt-16 border-t border-gray-800/80 py-8 text-center text-xs text-gray-500">
+        <p>© Antrenman Programı • Mobil Uyumlu HD Videolu Rehber</p>
+    </footer>
+
+    <script>
+        /* Video Switcher Function for Multi-option Exercises */
+        function switchVideo(videoId, newUrl, buttonElem, titleId, newTitleText) {
+            const videoElem = document.getElementById(videoId);
+            if (videoElem) {
+                videoElem.src = newUrl;
+                videoElem.load();
+                videoElem.play().catch(e => console.log("Autoplay prevented:", e));
+            }
+
+            if (titleId && newTitleText) {
+                const titleElem = document.getElementById(titleId);
+                if (titleElem) titleElem.textContent = newTitleText;
+            }
+
+            // Update Tab active styling in parent container
+            const parentContainer = buttonElem.parentElement;
+            if (parentContainer) {
+                const buttons = parentContainer.querySelectorAll('button');
+                buttons.forEach(btn => {
+                    btn.className = 'text-xs font-semibold py-1.5 rounded-lg text-gray-400 hover:text-white transition';
+                });
+                buttonElem.className = 'text-xs font-bold py-1.5 rounded-lg text-white bg-gray-800 border border-gray-700 shadow-sm transition';
+            }
+        }
+
+        /* Filter Days Function */
+        function filterDay(dayId) {
+            const sections = document.querySelectorAll('.day-section');
+            sections.forEach(sec => {
+                if (dayId === 'all') {
+                    sec.style.display = 'block';
+                } else if (sec.id === dayId) {
+                    sec.style.display = 'block';
+                } else {
+                    sec.style.display = 'none';
+                }
+            });
+
+            // Update filter buttons appearance
+            const filterBtns = document.querySelectorAll('[id^="btn-filter-"]');
+            filterBtns.forEach(btn => {
+                btn.classList.remove('bg-gray-800', 'text-white', 'border-gray-700', 'shadow-sm');
+                btn.classList.add('bg-gray-900/80', 'text-gray-400', 'border-gray-800');
+            });
+
+            const activeBtn = document.getElementById('btn-filter-' + dayId);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-900/80', 'text-gray-400', 'border-gray-800');
+                activeBtn.classList.add('bg-gray-800', 'text-white', 'border-gray-700', 'shadow-sm');
+            }
+        }
+
+        /* Search Function */
+        function searchExercises() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.exercise-card');
+
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                if (text.includes(query)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        /* Exercise Completed Toggle */
+        function toggleComplete(cardId) {
+            const card = document.getElementById(cardId);
+            if (!card) return;
+
+            const icon = card.querySelector('.complete-btn i');
+            card.classList.toggle('completed-card');
+
+            if (card.classList.contains('completed-card')) {
+                if (icon) {
+                    icon.className = 'fa-solid fa-circle-check text-emerald-400';
+                }
+            } else {
+                if (icon) {
+                    icon.className = 'fa-regular fa-circle-check';
+                }
+            }
+        }
+
+        let timerInterval = null;
+        let timerSeconds = 0;
+
+        function toggleRestTimerWidget() {
+            const widget = document.getElementById('restTimerWidget');
+            widget.classList.toggle('hidden');
+        }
+
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            timerSeconds = seconds;
+            updateTimerDisplay();
+
+            timerInterval = setInterval(() => {
+                timerSeconds--;
+                updateTimerDisplay();
+
+                if (timerSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    playBeepSound();
+                    const endMsg = "Süre Bitti!";
+                    if (document.getElementById('headerTimerText')) document.getElementById('headerTimerText').textContent = endMsg;
+                    if (document.getElementById('mobileTimerText')) document.getElementById('mobileTimerText').textContent = endMsg;
+                    setTimeout(() => {
+                        if (document.getElementById('headerTimerText')) document.getElementById('headerTimerText').textContent = "Dinlenme Sayacı";
+                        if (document.getElementById('mobileTimerText')) document.getElementById('mobileTimerText').textContent = "Sayaç";
+                    }, 4000);
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerSeconds = 0;
+            updateTimerDisplay();
+            if (document.getElementById('headerTimerText')) document.getElementById('headerTimerText').textContent = "Dinlenme Sayacı";
+            if (document.getElementById('mobileTimerText')) document.getElementById('mobileTimerText').textContent = "Sayaç";
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = formatted;
+
+            if (timerSeconds > 0) {
+                if (document.getElementById('headerTimerText')) document.getElementById('headerTimerText').textContent = formatted;
+                if (document.getElementById('mobileTimerText')) document.getElementById('mobileTimerText').textContent = formatted;
+            }
+        }
+
+        function playBeepSound() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start();
+                osc.stop(ctx.currentTime + 0.6);
+            } catch (e) {
+                console.log("Audio feedback prevented");
+            }
+        }
+    </script>
+</body>
+</html>
